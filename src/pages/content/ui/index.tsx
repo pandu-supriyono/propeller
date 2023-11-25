@@ -27,13 +27,15 @@ function focusHeading(id: string) {
     const originalTabIndex = heading.getAttribute('tabindex');
     heading.setAttribute('tabindex', '-1');
     heading.focus();
-    heading.style.outline = '4px solid #ff0';
+    heading.style.outline = '4px solid #fd0';
+    heading.style.transition = 'outline 0.1s ease-in-out';
 
     heading.addEventListener(
       'blur',
       () => {
         heading.setAttribute('tabindex', originalTabIndex);
         heading.style.outline = 'none';
+        heading.style.transition = 'none';
       },
       {
         once: true,
