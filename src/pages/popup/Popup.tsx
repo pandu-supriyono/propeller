@@ -94,7 +94,7 @@ function Headings() {
   }, [headings]);
 
   return (
-    <div>
+    <div className="headings">
       <h2>Headings</h2>
       <ul>
         {headings.map(heading => (
