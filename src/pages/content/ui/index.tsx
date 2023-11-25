@@ -22,14 +22,13 @@ function focusHeading(id: string) {
     const originalTabIndex = heading.getAttribute('tabindex');
     heading.setAttribute('tabindex', '-1');
     heading.focus();
-    heading.scrollIntoView({
-      block: 'start',
-    });
+    heading.style.outline = '4px solid #ff0';
 
     heading.addEventListener(
       'blur',
       () => {
         heading.setAttribute('tabindex', originalTabIndex);
+        heading.style.outline = 'none';
       },
       {
         once: true,
