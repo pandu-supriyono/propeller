@@ -6,13 +6,14 @@
   color: #fff;
 }
 
-.headings ul {
+.App ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.headings button {
+.App button,
+.App a {
   padding: 0;
   margin: 0;
   border: none;
@@ -22,10 +23,14 @@
   padding: 5px;
   color: #fff;
   width: 100%;
+  text-decoration: none;
+  display: block;
 }
 
-.headings button:hover,
-.headings button:focus {
+.App button:hover,
+.App button:focus,
+.App a:hover,
+.App a:focus {
   background-color: #fff;
   color: #18191A;
 }

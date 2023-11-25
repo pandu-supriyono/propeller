@@ -4,7 +4,8 @@ export type HeadingsList = {
   level: string;
 }[];
 
-export type headingsCollected = {
-  type: 'HEADINGS_COLLECTED';
-  payload: HeadingsList;
-};
+export type LinksList = {
+  id: string;
+  text: string;
+  href: string;
+}[];

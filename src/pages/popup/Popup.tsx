@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '@pages/popup/Popup.css';
 import withSuspense from '@src/shared/hoc/withSuspense';
 import withErrorBoundary from '@src/shared/hoc/withErrorBoundary';
-import { HEADINGS_REQUESTED, HEADING_PRESSED } from '@root/src/shared/constants';
-import { HeadingsList } from '@root/src/shared/types';
+import { HEADINGS_REQUESTED, HEADING_PRESSED, LINKS_REQUESTED } from '@root/src/shared/constants';
+import { HeadingsList, LinksList } from '@root/src/shared/types';
 
 const modes = ['HEADINGS', 'LINKS'] as const;
 
 const Popup = () => {
-  const [mode, setMode] = React.useState<(typeof modes)[number]>('HEADINGS');
+  const [mode, setMode] = React.useState<(typeof modes)[number]>('LINKS');
 
   React.useEffect(() => {
     // cycle modes by clciking left or right arrow
@@ -29,7 +29,7 @@ const Popup = () => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  });
+  }, [mode]);
 
   return (
     <div className="App">
@@ -73,11 +73,13 @@ function Headings() {
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowDown') {
+        e.preventDefault();
         const currentHeading = document.activeElement as HTMLButtonElement;
         const nextHeading = currentHeading.parentElement?.nextElementSibling?.querySelector('button');
         if (nextHeading) nextHeading.focus();
         if (!nextHeading) document.querySelector('button')?.focus();
       } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
         const currentHeading = document.activeElement as HTMLButtonElement;
         const nextHeading = currentHeading.parentElement?.previousElementSibling?.querySelector('button');
         if (nextHeading) nextHeading.focus();
@@ -110,9 +112,72 @@ function Headings() {
 }
 
 function Links() {
+  const [links, setLinks] = useState<LinksList>([]);
+
+  React.useEffect(() => {
+    async function postMessage() {
+      const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+      const response = await chrome.tabs.sendMessage(tab.id, { type: LINKS_REQUESTED });
+      setLinks(response);
+    }
+
+    postMessage();
+  }, []);
+
+  React.useEffect(() => {
+    const firstLink = document.querySelector('a');
+    if (firstLink) firstLink.focus();
+  }, [links]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const currentLink = document.activeElement as HTMLAnchorElement;
+        const nextLink = currentLink.parentElement?.nextElementSibling?.querySelector('a');
+        if (nextLink) nextLink.focus();
+        if (!nextLink) document.querySelector('a')?.focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const currentLink = document.activeElement as HTMLAnchorElement;
+        const nextLink = currentLink.parentElement?.previousElementSibling?.querySelector('a');
+        if (nextLink) nextLink.focus();
+        const lastLink = document.querySelector('ul')?.lastElementChild?.querySelector('a');
+        if (!nextLink && lastLink) lastLink.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [links]);
+
+  async function onLinkPressed(url: string) {
+    await chrome.tabs.update({ url });
+    window.close();
+  }
+
   return (
     <div>
       <h2>Links</h2>
+      <ul>
+        {links.map(link => (
+          <li key={link.id}>
+            <a
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={e => {
+                e.preventDefault();
+                onLinkPressed(link.href);
+              }}>
+              {link.text || ' '}
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
