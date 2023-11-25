@@ -1,11 +1,11 @@
 {
-  "name": "chrome-extension-boilerplate-react-vite",
+  "name": "Propeller",
   "version": "0.0.1",
-  "description": "chrome extension boilerplate",
+  "description": "A Chrome extension that provides a similar experience to the MacOS VoiceOver rotor, but without having to use VoiceOver.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite.git"
+    "url": "https://github.com/pandu-supriyono/propeller.git"
   },
   "scripts": {
     "build": "tsc --noEmit && vite build",
