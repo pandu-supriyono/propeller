@@ -1,5 +1,5 @@
 {
-  "name": "Propeller",
+  "name": "propeller",
   "version": "0.0.1",
   "description": "A Chrome extension that provides a similar experience to the MacOS VoiceOver rotor, but without having to use VoiceOver.",
   "license": "MIT",
