@@ -1,25 +1,58 @@
-import { createRoot } from 'react-dom/client';
-import App from '@pages/content/ui/app';
+import { HEADINGS_REQUESTED, HEADING_PRESSED } from '@root/src/shared/constants';
+import { HeadingsList } from '@root/src/shared/types';
 import refreshOnUpdate from 'virtual:reload-on-update-in-view';
 
 refreshOnUpdate('pages/content');
 
-const root = document.createElement('div');
-root.id = 'chrome-extension-boilerplate-react-vite-content-view-root';
+chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
+  if (request.type === HEADINGS_REQUESTED) {
+    const headings = collectHeadings();
+    sendResponse(headings);
+  }
 
-document.body.append(root);
+  if (request.type === HEADING_PRESSED) {
+    focusHeading(request.payload.id);
+  }
+});
 
-const rootIntoShadow = document.createElement('div');
-rootIntoShadow.id = 'shadow-root';
+function focusHeading(id: string) {
+  const heading = document.querySelector(`[propellor-id="${id}"]`) as HTMLElement;
 
-const shadowRoot = root.attachShadow({ mode: 'open' });
-shadowRoot.appendChild(rootIntoShadow);
+  if (heading) {
+    const originalTabIndex = heading.getAttribute('tabindex');
+    heading.setAttribute('tabindex', '-1');
+    heading.focus();
+    heading.scrollIntoView({
+      block: 'start',
+    });
 
-/**
- * https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/pull/174
- *
- * In the firefox environment, the adoptedStyleSheets bug may prevent contentStyle from being applied properly.
- * Please refer to the PR link above and go back to the contentStyle.css implementation, or raise a PR if you have a better way to improve it.
- */
+    heading.addEventListener(
+      'blur',
+      () => {
+        heading.setAttribute('tabindex', originalTabIndex);
+      },
+      {
+        once: true,
+      },
+    );
+  }
+}
 
-createRoot(rootIntoShadow).render(<App />);
+function collectHeadings() {
+  const allHeadings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+  const headingsList: HeadingsList = [];
+
+  allHeadings.forEach(heading => {
+    const uid = Math.random().toString(36).substr(2, 9);
+
+    heading.setAttribute('propellor-id', uid);
+
+    headingsList.push({
+      id: uid,
+      text: heading.textContent,
+      level: heading.tagName,
+    });
+  });
+
+  return headingsList;
+}
