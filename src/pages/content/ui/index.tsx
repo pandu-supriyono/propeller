@@ -21,7 +21,7 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
 });
 
 function focusHeading(id: string) {
-  const heading = document.querySelector(`[propellor-id="${id}"]`) as HTMLElement;
+  const heading = document.querySelector(`[propeller-id="${id}"]`) as HTMLElement;
 
   if (heading) {
     const originalTabIndex = heading.getAttribute('tabindex');
@@ -49,7 +49,7 @@ function collectLinks() {
   allLinks.forEach(link => {
     const uid = Math.random().toString(36).substr(2, 9);
 
-    link.setAttribute('propellor-id', uid);
+    link.setAttribute('propeller-id', uid);
 
     const href = link.getAttribute('href');
 
@@ -76,7 +76,7 @@ function collectHeadings() {
   allHeadings.forEach(heading => {
     const uid = Math.random().toString(36).substr(2, 9);
 
-    heading.setAttribute('propellor-id', uid);
+    heading.setAttribute('propeller-id', uid);
 
     if (heading.textContent != null) {
       headingsList.push({
